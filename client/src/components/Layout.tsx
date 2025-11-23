@@ -20,10 +20,20 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const { currentUser, logout } = useClinic();
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  if (!currentUser) return <>{children}</>;
+  // Redirect to login if not authenticated
+  if (!currentUser) {
+    // Use a small timeout or effect to avoid render-loop if immediate
+    // But simpler: just render a redirect or use effect
+    // Since we are in the render body, we should use useEffect for side effects like navigation
+    // However, to prevent flashing content, we can return null here.
+    
+    // We'll let the effect handle it.
+    setTimeout(() => setLocation('/'), 0);
+    return null;
+  }
 
   const navItems = [
     { role: 'receptionist', label: 'Pendaftaran', icon: UserPlus, href: '/reception' },

@@ -82,9 +82,28 @@ const INITIAL_PATIENTS: Patient[] = [
 
 export function ClinicProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<UserRole>(null);
-  const [patients, setPatients] = useState<Patient[]>(INITIAL_PATIENTS);
+  
+  // Initialize state from localStorage if available
+  const [patients, setPatients] = useState<Patient[]>(() => {
+    const saved = localStorage.getItem('clinic_patients');
+    return saved ? JSON.parse(saved) : INITIAL_PATIENTS;
+  });
+
   const [medicines] = useState<Medicine[]>(INITIAL_MEDICINES);
-  const [visits, setVisits] = useState<Visit[]>([]);
+  
+  const [visits, setVisits] = useState<Visit[]>(() => {
+    const saved = localStorage.getItem('clinic_visits');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Persist state changes to localStorage
+  useEffect(() => {
+    localStorage.setItem('clinic_patients', JSON.stringify(patients));
+  }, [patients]);
+
+  useEffect(() => {
+    localStorage.setItem('clinic_visits', JSON.stringify(visits));
+  }, [visits]);
 
   const login = (role: UserRole) => setCurrentUser(role);
   const logout = () => setCurrentUser(null);
