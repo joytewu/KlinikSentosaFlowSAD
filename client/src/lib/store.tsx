@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { addDays, format } from 'date-fns';
 
 // Types
-export type UserRole = 'admin' | 'doctor' | 'receptionist' | 'cashier' | null;
+export type UserRole = 'admin' | 'doctor' | 'receptionist' | 'cashier' | 'pharmacist' | null;
 
 export interface Patient {
   id: string;
@@ -37,7 +37,7 @@ export interface Visit {
   id: string;
   patientId: string;
   doctorName: string;
-  status: 'waiting' | 'in-consultation' | 'payment-pending' | 'completed';
+  status: 'waiting' | 'in-consultation' | 'pharmacy-queue' | 'payment-pending' | 'completed';
   complaint: string;
   diagnosis?: Diagnosis;
   totalCost: number;
@@ -58,6 +58,7 @@ interface ClinicContextType {
   createVisit: (patientId: string, complaint: string) => void;
   updateVisitStatus: (visitId: string, status: Visit['status']) => void;
   submitDiagnosis: (visitId: string, diagnosis: Diagnosis) => void;
+  processPrescription: (visitId: string) => void;
   processPayment: (visitId: string, method: 'cash' | 'transfer') => void;
   
   getQueue: (status: Visit['status']) => (Visit & { patient: Patient })[];
@@ -149,6 +150,13 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       ...v,
       diagnosis,
       totalCost,
+      status: 'pharmacy-queue'
+    } : v));
+  };
+
+  const processPrescription = (visitId: string) => {
+    setVisits(visits.map(v => v.id === visitId ? {
+      ...v,
       status: 'payment-pending'
     } : v));
   };
@@ -187,7 +195,7 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
     <ClinicContext.Provider value={{
       currentUser, login, logout,
       patients, visits, medicines,
-      registerPatient, createVisit, updateVisitStatus, submitDiagnosis, processPayment,
+      registerPatient, createVisit, updateVisitStatus, submitDiagnosis, processPrescription, processPayment,
       getQueue, getRevenue
     }}>
       {children}

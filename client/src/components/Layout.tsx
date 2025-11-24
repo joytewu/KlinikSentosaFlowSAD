@@ -7,7 +7,8 @@ import {
   CreditCard, 
   LogOut, 
   Activity,
-  Menu
+  Menu,
+  Pill
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -38,6 +39,7 @@ export default function Layout({ children }: LayoutProps) {
   const navItems = [
     { role: 'receptionist', label: 'Pendaftaran', icon: UserPlus, href: '/reception' },
     { role: 'doctor', label: 'Pemeriksaan', icon: Stethoscope, href: '/doctor' },
+    { role: 'pharmacist', label: 'Apotek', icon: Pill, href: '/pharmacy' },
     { role: 'cashier', label: 'Pembayaran', icon: CreditCard, href: '/payment' },
     { role: 'admin', label: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
   ];

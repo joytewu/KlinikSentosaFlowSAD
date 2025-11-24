@@ -1,7 +1,7 @@
 import { useClinic } from '@/lib/store';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { UserCog, Stethoscope, CreditCard, LayoutDashboard } from 'lucide-react';
+import { UserCog, Stethoscope, CreditCard, LayoutDashboard, Pill } from 'lucide-react';
 import { useLocation } from 'wouter';
 import logoImage from '@assets/generated_images/modern_minimalist_medical_cross_logo_with_leaf_element.png';
 import bgImage from '@assets/generated_images/abstract_medical_technology_background.png';
@@ -67,6 +67,18 @@ export default function AuthPage() {
                 <Stethoscope className="w-5 h-5" />
               </div>
               Dokter Pemeriksa
+            </Button>
+
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="w-full h-14 text-lg justify-start gap-4 transition-transform hover:scale-[1.02] bg-white hover:bg-slate-50"
+              onClick={() => handleLogin('pharmacist', '/pharmacy')}
+            >
+              <div className="w-8 h-8 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center">
+                <Pill className="w-5 h-5" />
+              </div>
+              Apoteker / Farmasi
             </Button>
 
             <Button 

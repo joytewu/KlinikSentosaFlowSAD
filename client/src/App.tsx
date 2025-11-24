@@ -10,6 +10,7 @@ import Layout from "@/components/Layout";
 import AuthPage from "@/pages/Auth";
 import ReceptionPage from "@/pages/Reception";
 import DoctorPage from "@/pages/Doctor";
+import PharmacyPage from "@/pages/Pharmacy";
 import PaymentPage from "@/pages/Payment";
 import AdminPage from "@/pages/Admin";
 
@@ -27,6 +28,12 @@ function Router() {
       <Route path="/doctor">
         <Layout>
           <DoctorPage />
+        </Layout>
+      </Route>
+      
+      <Route path="/pharmacy">
+        <Layout>
+          <PharmacyPage />
         </Layout>
       </Route>
       
