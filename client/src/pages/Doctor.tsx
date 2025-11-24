@@ -1,24 +1,85 @@
+import { useState } from 'react';
+import { useClinic, Medicine, Diagnosis } from '@/lib/store';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { Stethoscope, Plus, Trash2, Pill, CheckCircle2, User, Clock, History, FileText } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { History, FileText } from 'lucide-react';
 
-// ... imports
+const diagnosisSchema = z.object({
+  notes: z.string().min(10, "Diagnosis harus detail"),
+  prescriptions: z.array(z.object({
+    medicineId: z.string().min(1, "Pilih obat"),
+    dosage: z.string().min(1, "Dosis wajib diisi"),
+    quantity: z.coerce.number().min(1, "Jumlah minimal 1"),
+  })).min(0)
+});
 
 export default function DoctorPage() {
   const { getQueue, updateVisitStatus, submitDiagnosis, medicines, visits } = useClinic();
-  // ... (rest of state)
+  const { toast } = useToast();
+  const [selectedVisitId, setSelectedVisitId] = useState<string | null>(null);
+
+  const waitingQueue = getQueue('waiting');
+  const selectedVisit = waitingQueue.find(v => v.id === selectedVisitId);
 
   // Get patient history
   const patientHistory = selectedVisit 
     ? visits.filter(v => v.patientId === selectedVisit.patientId && v.status === 'completed' && v.id !== selectedVisit.id)
     : [];
 
-  // ... (rest of logic)
+  const form = useForm<z.infer<typeof diagnosisSchema>>({
+    resolver: zodResolver(diagnosisSchema),
+    defaultValues: { notes: '', prescriptions: [] }
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "prescriptions"
+  });
+
+  const handleStartConsultation = (visitId: string) => {
+    setSelectedVisitId(visitId);
+    form.reset({ notes: '', prescriptions: [] });
+  };
+
+  const onSubmit = (data: z.infer<typeof diagnosisSchema>) => {
+    if (!selectedVisitId) return;
+
+    const enrichedPrescriptions = data.prescriptions.map(p => {
+      const med = medicines.find(m => m.id === p.medicineId)!;
+      return {
+        ...p,
+        medicineName: med.name,
+        price: med.price
+      };
+    });
+
+    submitDiagnosis(selectedVisitId, {
+      notes: data.notes,
+      prescriptions: enrichedPrescriptions
+    });
+
+    toast({
+      title: "Pemeriksaan Selesai",
+      description: "Resep telah dikirim ke bagian pembayaran.",
+    });
+    setSelectedVisitId(null);
+  };
 
   return (
     <div className="grid lg:grid-cols-3 gap-8 h-[calc(100vh-100px)]">
-      {/* Sidebar Queue - No changes */}
+      {/* Sidebar Queue */}
       <Card className="lg:col-span-1 border-none shadow-lg flex flex-col h-full">
-        {/* ... same sidebar content ... */}
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2">
             <Clock className="w-5 h-5 text-primary" />
